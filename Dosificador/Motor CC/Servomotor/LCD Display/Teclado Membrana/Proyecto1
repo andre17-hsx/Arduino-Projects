@@ -1,0 +1,116 @@
+#include <Servo.h>
+#include <Keypad.h>
+#include <LiquidCrystal.h>
+
+//LEDS
+int LEDVERDE = 7;
+int LEDROJO = 6;
+//LCD
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+//mensajes 
+#define FRASE1 "BIENVENIDO ANDRE"
+#define FRASE2 "INGRESE OPCION"
+
+//MOTOR
+#define MOTOR A1
+
+//SERVO
+Servo myservo;
+
+//TECLADO MEMBRANA
+const byte ROWS = 4;
+const byte COLS = 4;
+char keys[ROWS][COLS] = {
+{'1','2','3','A'}, 
+{'4','5','6','B'},
+{'7','8','9','C'},
+{'*','0','#','D'}
+};
+
+byte rowPins[ROWS] = {A5, A4, A3, A2};
+byte colPins[COLS] = {13, 10, 9, 8}; 
+Keypad teclado = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
+char tecla;
+int teclaingresada=0;
+#define opcion1 "A1"
+#define opcion2 "B1"
+int index=0;
+int x=0;
+
+void setup() {
+  myservo.attach(A0);
+  lcd.begin(16, 2);
+  lcd.setCursor(0,0);
+  lcd.print(FRASE1);
+  pinMode(LEDVERDE, OUTPUT);
+  pinMode(LEDROJO, OUTPUT);
+  intro();
+
+}
+
+void intro (){
+  delay(1500);
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print(FRASE2);
+}
+
+void loop() {
+  char key = teclado.getKey();
+
+  if (key!=opcion1[index] & key!=opcion2[x] & key){
+    teclaingresada++;
+    if(teclaingresada==2){
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("Codigo invalido");
+      delay(3500);
+      teclaingresada=0;
+      intro();
+      
+    }
+  }
+      
+      
+  if (key==opcion1[index]){
+    index++;
+    if (index==2){
+    digitalWrite(MOTOR, HIGH);
+    digitalWrite(LEDVERDE, HIGH);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("DOSICIFANDO CREMA");
+    delay(15000);
+    digitalWrite(MOTOR, LOW);
+    digitalWrite(LEDVERDE, LOW);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Dosificacion completa");
+    delay(2000);
+    intro();
+    index=0;
+    }
+  }
+  if (key==opcion2[x]){
+    x++;
+    if (x==2){
+    myservo.write(90);
+    digitalWrite(LEDROJO, HIGH);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("DOSICIFANDO ADEREZO");
+    delay(10000);
+	myservo.write(0);
+    digitalWrite(LEDROJO, LOW);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Dosificacion completa");
+    delay(2000);
+    intro();
+    x=0;
+    
+    }
+  }
+   
+  
+}
